@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/bin/searchqa:*)",
+      "Bash(git -C repos/bigdata_elasticsearch log:*)",
+      "Bash(git -C repos/bigdata_elasticsearch diff:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(http:*)",
+      "Bash(https:*)",
+      "Bash(xh:*)",
+      "Bash(nc:*)",
+      "Bash(telnet:*)",
+      "Bash(kubectl:*)",
+      "Bash(gcloud:*)",
+      "Bash(gsutil:*)",
+      "Bash(ssh:*)",
+      "Bash(cat .env:*)",
+      "WebFetch"
+    ]
+  }
+}
