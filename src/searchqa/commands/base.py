@@ -1,6 +1,7 @@
 """
 Base class for CLI commands.
 """
+
 import argparse
 import json
 from abc import ABC, abstractmethod
@@ -19,11 +20,12 @@ class BaseCommand(ABC):
     Subclasses set `name` and `help`, declare arguments in `add_arguments`,
     and implement `run`.
     """
+
     name: str
     help: str
     needs_es: bool = True
 
-    def add_arguments(self, parser: argparse.ArgumentParser) -> None:
+    def add_arguments(self, parser: argparse.ArgumentParser) -> None:  # noqa: B027
         """
         Declare command-specific arguments.
 
@@ -47,8 +49,9 @@ class BaseCommand(ABC):
     @staticmethod
     def add_index_argument(parser: argparse.ArgumentParser) -> None:
         """Add the common `--index` option."""
-        parser.add_argument("--index", default=DEFAULT_INDEX,
-                            help=f"Index or alias (default: {DEFAULT_INDEX})")
+        parser.add_argument(
+            "--index", default=DEFAULT_INDEX, help=f"Index or alias (default: {DEFAULT_INDEX})"
+        )
 
     @staticmethod
     def parse_json(value: str | None, label: str) -> dict[str, Any]:

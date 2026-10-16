@@ -3,6 +3,7 @@ searchqa CLI entry point.
 
 Usage: python -m searchqa <command> [--env dev|stage|prod] [--pretty] ...
 """
+
 import argparse
 import json
 import sys
@@ -64,13 +65,17 @@ class CLI:
 
     def _build_parser(self) -> argparse.ArgumentParser:
         common = argparse.ArgumentParser(add_help=False)
-        common.add_argument("--env", default=DEFAULT_ENV.value,
-                            choices=[e.value for e in Environment],
-                            help=f"Target environment (default: {DEFAULT_ENV.value})")
+        common.add_argument(
+            "--env",
+            default=DEFAULT_ENV.value,
+            choices=[e.value for e in Environment],
+            help=f"Target environment (default: {DEFAULT_ENV.value})",
+        )
         common.add_argument("--pretty", action="store_true", help="Indent JSON output")
 
-        parser = argparse.ArgumentParser(prog="searchqa",
-                                         description="Read-only Elasticsearch diagnostics")
+        parser = argparse.ArgumentParser(
+            prog="searchqa", description="Read-only Elasticsearch diagnostics"
+        )
         subparsers = parser.add_subparsers(dest="command", required=True)
         for command in self.commands.values():
             subparser = subparsers.add_parser(command.name, help=command.help, parents=[common])

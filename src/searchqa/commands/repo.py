@@ -1,6 +1,7 @@
 """
 Local clone management for the bigdata_elasticsearch repo.
 """
+
 import argparse
 import subprocess
 from typing import Any
@@ -16,6 +17,7 @@ EXCLUDED_DIRS = ("plugins", "infra", "tools")
 
 class RepoSyncCommand(BaseCommand):
     """Clone or update the bigdata_elasticsearch repo (sparse, branch main)."""
+
     name = "repo-sync"
     help = "Clone or pull bigdata_elasticsearch (main, excluding plugins/infra/tools)"
     needs_es = False
@@ -23,8 +25,16 @@ class RepoSyncCommand(BaseCommand):
     def run(self, args: argparse.Namespace, client: ReadOnlyESClient | None) -> Any:
         if not (REPO_DIR / ".git").exists():
             REPO_DIR.parent.mkdir(parents=True, exist_ok=True)
-            self._git("clone", "--filter=blob:none", "--no-checkout", "--branch", BRANCH,
-                      ConfigLoader.repo_url(), str(REPO_DIR), cwd=None)
+            self._git(
+                "clone",
+                "--filter=blob:none",
+                "--no-checkout",
+                "--branch",
+                BRANCH,
+                ConfigLoader.repo_url(),
+                str(REPO_DIR),
+                cwd=None,
+            )
             patterns = ["/*", *(f"!/{d}/" for d in EXCLUDED_DIRS)]
             self._git("sparse-checkout", "set", "--no-cone", *patterns)
             self._git("checkout", BRANCH)

@@ -3,9 +3,10 @@ Configuration loading for searchqa.
 
 Reads Elasticsearch connection settings per environment from `.env`.
 """
+
 import os
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -14,14 +15,15 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 REPO_DIR = PROJECT_ROOT / "repos" / "bigdata_elasticsearch"
 
 
-class Environment(str, Enum):
+class Environment(StrEnum):
     """Target Elasticsearch environment."""
+
     DEV = "dev"
     STAGE = "stage"
     PROD = "prod"
 
     @classmethod
-    def from_string(cls, value: str) -> "Environment":
+    def from_string(cls, value: str) -> Environment:
         """
         Convert string to Environment (case-insensitive).
 
@@ -47,6 +49,7 @@ DEFAULT_ENV = Environment.STAGE
 @dataclass(frozen=True)
 class ESConfig:
     """Connection settings for one Elasticsearch environment."""
+
     env: Environment
     host: str
     username: str
@@ -81,7 +84,9 @@ class ConfigLoader:
             ValueError: If any required variable is missing.
         """
         prefix = f"ES_{env.value.upper()}_"
-        values = {key: os.getenv(prefix + key.upper(), "") for key in ("host", "username", "password")}
+        values = {
+            key: os.getenv(prefix + key.upper(), "") for key in ("host", "username", "password")
+        }
         missing = [prefix + key.upper() for key, value in values.items() if not value]
         if missing:
             raise ValueError(f"Missing in .env: {', '.join(missing)}")
