@@ -55,9 +55,8 @@ codex
 ```bash
 cd ~/Desktop/work/tools/"searchQA agent"
 
-# 1. Python 環境（需要 Python 3.14）
-python3.14 -m venv .venv
-.venv/bin/pip install -e ".[dev]"
+# 1. Python 環境（使用 uv，需要 Python 3.14）
+uv sync --all-extras
 
 # 2. ES 連線設定
 cp .env.example .env
@@ -67,7 +66,7 @@ cp .env.example .env
 .venv/bin/searchqa repo-sync
 
 # 4. 確認可以運作
-.venv/bin/pytest
+uv run pytest
 .venv/bin/searchqa analyze 禮卷 --analyzer custom_ik_syn_query
 ```
 
@@ -166,5 +165,5 @@ agent 會自行使用，也可以手動執行：
 - 規則、skills 有變動時，改 `AGENTS.md` 與 `skills/`，不要改 `CLAUDE.md`。
 - 新增 ES endpoint 必須同時更新 `client.py` 的 `ENDPOINT_ALLOWLIST` 與 `tests/test_client.py`。
 - 新增子指令：在 `src/searchqa/commands/` 繼承 `BaseCommand`，並加入 `__main__.py` 的 `COMMANDS`。
-- 測試：`.venv/bin/pytest`
-- Lint / format：`.venv/bin/ruff check . && .venv/bin/ruff format .`
+- 測試：`uv run pytest`
+- Lint / format：`uv run ruff check . && uv run ruff format .`
