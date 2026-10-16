@@ -1,10 +1,15 @@
 # Changelog
 
-All notable changes to this project are documented here. The format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). There are no tagged releases yet, so
-everything lives under `Unreleased`.
+All notable changes to this project are documented here, newest first, grouped by the date the
+change landed on `main` (`YYYY-MM-DD`). The category names (`Added` / `Changed` / `Fixed`) follow
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). There are no tagged releases.
 
-## [Unreleased]
+## 2026-10-16
+
+### Added
+
+- `AGENTS.md`: release workflow (branch from latest `main`, PR, human review, no direct merge).
+- `CHANGELOG.md`.
 
 ### Changed
 
@@ -18,8 +23,3 @@ everything lives under `Unreleased`.
   Previously it was placed in template `params`, which the stored product templates ignore, so no
   `explanation` was returned.
 - `ruff check` and `ruff format --check` pass on `main`.
-
-### Added
-
-- `AGENTS.md`: release workflow (branch from latest `main`, PR, human review, no direct merge).
-- `CHANGELOG.md`.
