@@ -127,3 +127,17 @@ Located in `skills/` (single source; `.claude/skills` is a symlink).
 - Requests never carry a body; payload goes in `?source=`.
 - Paths must match the endpoint allowlist; anything else raises before any network call.
 - Do not use the `elasticsearch` Python package (its `search()` sends POST and it exposes write APIs).
+
+## Release workflow
+
+Never merge into `main` directly, and never push to `main`. Every change goes through a feature branch and a PR that a human reviews and merges.
+
+1. **Update `main` first.** Before creating any branch: `git checkout main && git pull --ff-only origin main`. If the pull is not a fast-forward, stop and ask.
+2. **Branch from the latest `main`.** `git checkout -b <type>/<short-description>` (e.g. `fix/search-explain`, `feat/analyze-empty-hint`). One topic per branch.
+3. **Develop and verify locally.** Run `.venv/bin/ruff check . && .venv/bin/ruff format .` and `.venv/bin/pytest`; both must pass. Changes to `client.py` must keep its invariants covered by tests.
+4. **Commit and push the feature branch.** `git push -u origin <branch>`. Never force-push shared branches.
+5. **Open a PR against `main`.** Describe what changed and why, and how it was tested. Do not enable auto-merge.
+6. **Wait for human review.** Do not merge, approve, or dismiss reviews yourself, even if checks pass. Address review comments with follow-up commits on the same branch.
+7. **After the human merges**, update `main` again (step 1) before starting the next branch.
+
+If `main` moves while a PR is open, rebase or merge `main` into the feature branch (never the reverse) and re-run step 3.
