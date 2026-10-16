@@ -114,12 +114,12 @@ Located in `skills/` (single source; `.claude/skills` is a symlink).
 
 ## Development
 
-- Python 3.14 in `.venv` (`python3.14 -m venv .venv && .venv/bin/pip install -e ".[dev]"`); `pyproject.toml` is uv-compatible. Deps: `httpx`, `python-dotenv`. CLI via `argparse`.
+- Python 3.14 managed with [uv](https://docs.astral.sh/uv/): `uv sync --all-extras` creates `.venv` and installs dev deps from `uv.lock` (committed). Do not use `pip`. Deps: `httpx`, `python-dotenv`. CLI via `argparse`.
 - Each subcommand is a `BaseCommand` subclass in `src/searchqa/commands/`, registered in `COMMANDS` in `__main__.py`.
 - Class-based design, matching `search/datafeed` style: module docstrings, Google-style docstrings (`Args:` / `Returns:` / `Raises:`), type hints, `Enum` for fixed values.
 - Code, comments, docs, and skills in English.
-- Lint/format: `.venv/bin/ruff check . && .venv/bin/ruff format .`
-- Test: `.venv/bin/pytest`
+- Lint/format: `uv run ruff check . && uv run ruff format .`
+- Test: `uv run pytest`
 
 ### `client.py` invariants (must stay covered by tests)
 
@@ -134,7 +134,7 @@ Never merge into `main` directly, and never push to `main`. Every change goes th
 
 1. **Update `main` first.** Before creating any branch: `git checkout main && git pull --ff-only origin main`. If the pull is not a fast-forward, stop and ask.
 2. **Branch from the latest `main`.** `git checkout -b <type>/<short-description>` (e.g. `fix/search-explain`, `feat/analyze-empty-hint`). One topic per branch.
-3. **Develop and verify locally.** Run `.venv/bin/ruff check . && .venv/bin/ruff format .` and `.venv/bin/pytest`; both must pass. Changes to `client.py` must keep its invariants covered by tests.
+3. **Develop and verify locally.** Run `uv run ruff check . && uv run ruff format .` and `uv run pytest`; both must pass. Changes to `client.py` must keep its invariants covered by tests.
 4. **Commit and push the feature branch.** `git push -u origin <branch>`. Never force-push shared branches.
 5. **Open a PR against `main`.** Describe what changed and why, and how it was tested. Do not enable auto-merge.
 6. **Wait for human review.** Do not merge, approve, or dismiss reviews yourself, even if checks pass. Address review comments with follow-up commits on the same branch.
