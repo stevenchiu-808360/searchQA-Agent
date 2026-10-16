@@ -134,7 +134,7 @@ Never merge into `main` directly, and never push to `main`. Every change goes th
 
 1. **Update `main` first.** Before creating any branch: `git checkout main && git pull --ff-only origin main`. If the pull is not a fast-forward, stop and ask.
 2. **Branch from the latest `main`.** `git checkout -b <type>/<short-description>` (e.g. `fix/search-explain`, `feat/analyze-empty-hint`). One topic per branch.
-3. **Develop and verify locally.** Run `uv run ruff check . && uv run ruff format .` and `uv run pytest`; both must pass. Changes to `client.py` must keep its invariants covered by tests.
+3. **Develop and verify locally.** Run `uv run ruff check . && uv run ruff format .` and `uv run pytest`; both must pass. Changes to `client.py` must keep its invariants covered by tests. Add one line under `## [Unreleased]` in `CHANGELOG.md` (`Added` / `Changed` / `Fixed`) for any user-visible change to the CLI, skills, or rules; docs-only and lint-only PRs are exempt.
 4. **Commit and push the feature branch.** `git push -u origin <branch>`. Never force-push shared branches.
 5. **Open a PR against `main`.** Describe what changed and why, and how it was tested. Do not enable auto-merge.
 6. **Wait for human review.** Do not merge, approve, or dismiss reviews yourself, even if checks pass. Address review comments with follow-up commits on the same branch.
