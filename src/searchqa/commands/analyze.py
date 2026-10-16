@@ -3,6 +3,8 @@ Tokenization command.
 """
 
 import argparse
+import json
+import sys
 from typing import Any
 
 from searchqa.client import ReadOnlyESClient
@@ -38,7 +40,51 @@ class AnalyzeCommand(BaseCommand):
             return client.get(f"/{args.index}/_analyze", payload=payload)
 
         response = client.get(f"/{args.index}/_analyze", payload=payload)
-        return [
+        tokens = [
             {"token": t["token"], "position": t["position"], "type": t["type"]}
             for t in response["tokens"]
         ]
+        if not tokens:
+            self._warn_empty(client, args.index, payload)
+        return tokens
+
+    def _warn_empty(self, client: ReadOnlyESClient, index: str, payload: dict[str, Any]) -> None:
+        """
+        Print a stderr warning naming the stage that removed every token.
+
+        Args:
+            client: ES client.
+            index: Index used for the analysis.
+            payload: The original `_analyze` payload (without `explain`).
+        """
+        detail = client.get(f"/{index}/_analyze", payload={**payload, "explain": True})["detail"]
+        message = self.empty_reason(detail)
+        print(json.dumps({"warning": message}, ensure_ascii=False), file=sys.stderr)
+
+    @staticmethod
+    def empty_reason(detail: dict[str, Any]) -> str:
+        """
+        Explain why an `_analyze` call produced no tokens.
+
+        Args:
+            detail: The `detail` object of an `_analyze` response with `explain: true`.
+
+        Returns:
+            A one-line description of the first stage whose output was empty.
+        """
+        if not detail.get("custom_analyzer"):
+            name = detail.get("analyzer", {}).get("name", "analyzer")
+            return f"No tokens: analyzer {name} produced no tokens."
+        tokenizer = detail.get("tokenizer", {})
+        if not tokenizer.get("tokens"):
+            return (
+                f"No tokens: tokenizer {tokenizer.get('name')} already produced no tokens "
+                "(dictionary or stopword handling inside the tokenizer); no filter is involved."
+            )
+        for token_filter in detail.get("tokenfilters", []):
+            if not token_filter.get("tokens"):
+                return (
+                    f"No tokens: all tokens were removed by token filter "
+                    f"{token_filter.get('name')}."
+                )
+        return "No tokens: the analyzer produced no tokens."
