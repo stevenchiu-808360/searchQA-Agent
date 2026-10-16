@@ -1,6 +1,7 @@
 """
 Search template commands: render, search, script.
 """
+
 import argparse
 from typing import Any
 
@@ -10,6 +11,7 @@ from searchqa.commands.base import BaseCommand
 
 class RenderCommand(BaseCommand):
     """Render a stored search template into the actual query."""
+
     name = "render"
     help = "Render a stored search template with params"
 
@@ -25,6 +27,7 @@ class RenderCommand(BaseCommand):
 
 class SearchCommand(BaseCommand):
     """Run a stored search template and return compact hits."""
+
     name = "search"
     help = "Run a stored search template and list hits"
 
@@ -33,16 +36,21 @@ class SearchCommand(BaseCommand):
         parser.add_argument("template_id", help="Stored template id, e.g. search_product_fuzzy")
         parser.add_argument("--params", help="Template params as a JSON object")
         parser.add_argument("--fields", help="Comma-separated _source fields to include per hit")
-        parser.add_argument("--explain", action="store_true",
-                            help="Set template param explain=true and include score explanations")
+        parser.add_argument(
+            "--explain",
+            action="store_true",
+            help="Request score explanations (top-level explain=true)",
+        )
         parser.add_argument("--raw", action="store_true", help="Return the full ES response")
 
     def run(self, args: argparse.Namespace, client: ReadOnlyESClient | None) -> Any:
         params = self.parse_json(args.params, "--params")
+        payload: dict[str, Any] = {"id": args.template_id, "params": params}
         if args.explain:
-            params["explain"] = True
-        response = client.get(f"/{args.index}/_search/template",
-                              payload={"id": args.template_id, "params": params})
+            # `explain` is a top-level _search/template field; stored templates do not
+            # reference it, so putting it in `params` would be silently ignored.
+            payload["explain"] = True
+        response = client.get(f"/{args.index}/_search/template", payload=payload)
         if args.raw:
             return response
 
@@ -63,6 +71,7 @@ class SearchCommand(BaseCommand):
 
 class ScriptCommand(BaseCommand):
     """Fetch a stored script/template as deployed on the cluster."""
+
     name = "script"
     help = "Get a stored search template from the cluster"
 
