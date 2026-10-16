@@ -8,6 +8,8 @@ change landed on `main` (`YYYY-MM-DD`). The category names (`Added` / `Changed` 
 
 ### Added
 
+- `searchqa analyze` prints a stderr warning when the result is empty, naming the stage that
+  removed every token (tokenizer or a specific token filter). stdout is unchanged (`[]`).
 - `AGENTS.md`: release workflow (branch from latest `main`, PR, human review, no direct merge).
 - `CHANGELOG.md`.
 
