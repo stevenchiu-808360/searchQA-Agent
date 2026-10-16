@@ -1,6 +1,7 @@
 """
 Learning-to-rank inspection command.
 """
+
 import argparse
 from typing import Any
 
@@ -10,6 +11,7 @@ from searchqa.commands.base import BaseCommand
 
 class LtrCommand(BaseCommand):
     """Fetch an LTR model or feature set from the default feature store."""
+
     name = "ltr"
     help = "Get an LTR model or feature set"
 

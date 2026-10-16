@@ -9,6 +9,7 @@ Safety invariants (covered by tests/test_client.py):
    "GET-only" alone is not sufficient.
 4. A request hook re-checks method and body right before sending, as a last line of defense.
 """
+
 import json
 import re
 from typing import Any
@@ -25,7 +26,7 @@ _NAME = r"[A-Za-z0-9%][A-Za-z0-9%._-]*"
 ENDPOINT_ALLOWLIST: tuple[re.Pattern[str], ...] = tuple(
     re.compile(rf"^/{pattern}$")
     for pattern in (
-        r"",                                            # cluster info
+        r"",  # cluster info
         rf"(?:{_INDEX}/)?_analyze",
         rf"_render/template(?:/{_NAME})?",
         rf"{_INDEX}/_search(?:/template)?",
@@ -39,11 +40,25 @@ ENDPOINT_ALLOWLIST: tuple[re.Pattern[str], ...] = tuple(
     )
 )
 
-QUERY_PARAM_ALLOWLIST = frozenset({
-    "filter_path", "format", "h", "v", "s", "human", "typed_keys", "flat_settings",
-    "include_defaults", "_source", "_source_includes", "_source_excludes",
-    "stored_fields", "routing", "preference",
-})
+QUERY_PARAM_ALLOWLIST = frozenset(
+    {
+        "filter_path",
+        "format",
+        "h",
+        "v",
+        "s",
+        "human",
+        "typed_keys",
+        "flat_settings",
+        "include_defaults",
+        "_source",
+        "_source_includes",
+        "_source_excludes",
+        "stored_fields",
+        "routing",
+        "preference",
+    }
+)
 
 # ES default http.max_initial_line_length is 4kb; leave room for "GET " and " HTTP/1.1".
 MAX_REQUEST_LINE = 4000
@@ -62,8 +77,9 @@ class ReadOnlyESClient:
     Read-only Elasticsearch client that can only issue allowlisted GET requests.
     """
 
-    def __init__(self, config: ESConfig, timeout: float = 30.0,
-                 transport: httpx.BaseTransport | None = None):
+    def __init__(
+        self, config: ESConfig, timeout: float = 30.0, transport: httpx.BaseTransport | None = None
+    ):
         """
         Args:
             config: Connection settings for the target environment.
@@ -80,8 +96,13 @@ class ReadOnlyESClient:
             event_hooks={"request": [self._guard_request]},
         )
 
-    def get(self, path: str, payload: dict[str, Any] | None = None,
-            params: dict[str, str] | None = None, allow_not_found: bool = False) -> Any:
+    def get(
+        self,
+        path: str,
+        payload: dict[str, Any] | None = None,
+        params: dict[str, str] | None = None,
+        allow_not_found: bool = False,
+    ) -> Any:
         """
         Send a GET request.
 
@@ -125,7 +146,7 @@ class ReadOnlyESClient:
         """Close the underlying HTTP connection pool."""
         self._http.close()
 
-    def __enter__(self) -> "ReadOnlyESClient":
+    def __enter__(self) -> ReadOnlyESClient:
         return self
 
     def __exit__(self, *exc: object) -> None:
@@ -139,8 +160,9 @@ class ReadOnlyESClient:
             raise BlockedRequestError(f"Endpoint not allowlisted: {path}")
 
     @staticmethod
-    def _build_query(payload: dict[str, Any] | None,
-                     params: dict[str, str] | None) -> dict[str, str]:
+    def _build_query(
+        payload: dict[str, Any] | None, params: dict[str, str] | None
+    ) -> dict[str, str]:
         query = dict(params or {})
         disallowed = set(query) - QUERY_PARAM_ALLOWLIST
         if disallowed:

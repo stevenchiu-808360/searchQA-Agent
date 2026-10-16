@@ -1,6 +1,7 @@
 """
 Index inspection commands: doc, mapping, settings.
 """
+
 import argparse
 from typing import Any
 
@@ -10,6 +11,7 @@ from searchqa.commands.base import BaseCommand
 
 class DocCommand(BaseCommand):
     """Fetch a single document by id."""
+
     name = "doc"
     help = "Get a document by id"
 
@@ -20,12 +22,14 @@ class DocCommand(BaseCommand):
 
     def run(self, args: argparse.Namespace, client: ReadOnlyESClient | None) -> Any:
         params = {"_source_includes": args.fields} if args.fields else None
-        return client.get(f"/{args.index}/_doc/{self.segment(args.doc_id)}", params=params,
-                          allow_not_found=True)
+        return client.get(
+            f"/{args.index}/_doc/{self.segment(args.doc_id)}", params=params, allow_not_found=True
+        )
 
 
 class MappingCommand(BaseCommand):
     """Fetch index mapping, optionally for one field."""
+
     name = "mapping"
     help = "Get index mapping (optionally filtered to one field)"
 
@@ -40,13 +44,15 @@ class MappingCommand(BaseCommand):
 
 class SettingsCommand(BaseCommand):
     """Fetch index settings, optionally only the analysis section."""
+
     name = "settings"
     help = "Get index settings"
 
     def add_arguments(self, parser: argparse.ArgumentParser) -> None:
         self.add_index_argument(parser)
-        parser.add_argument("--analysis", action="store_true",
-                            help="Only show analyzers, tokenizers and filters")
+        parser.add_argument(
+            "--analysis", action="store_true", help="Only show analyzers, tokenizers and filters"
+        )
 
     def run(self, args: argparse.Namespace, client: ReadOnlyESClient | None) -> Any:
         params = {"filter_path": "*.settings.index.analysis"} if args.analysis else None
